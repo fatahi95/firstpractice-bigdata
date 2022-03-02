@@ -1,0 +1,37 @@
+import pyspark
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName('homework1').getOrCreate()
+ssc=spark.sparkContext
+
+//ایجاد دیتا و تبدیل به RDD
+x=['pizza','potato','frenchfries','hotdog','hamburger','egg','mashpotato','ghormesabzi',
+   'loobiapolo','omlet','spagetty','pasta','kookoosabzi','chicken','kabab','soup','ash reshte','zereshkpolo'
+   ,'kookoosibzamini', 'salad','noonpanir','khoreshte karafs','kashk bademjoon','salad olvie','kotlet','lazania','fish',
+   'shrimp','kalampolo','khoreshte bamie','havijpolo']
+rdd=ssc.parallelize(x)
+rdd.collect()
+
+//بازگرداندن عنصر 20ام
+rdd2=rdd.filter(lambda x:(x))
+rdd2.collect()[19]
+
+//تبدیل به حروف بزرگ
+from pyspark.sql.functions import upper
+rdd3=rdd.map(lambda x:x.upper())
+rdd3.collect()
+
+//دسته بندی براساس اولین کاراکتر
+rdd4= rdd.groupBy(lambda x: x[0]).map(lambda x: ([0],list(x[1])))
+rdd4.collect()
+
+//تبدیل توکن به آردی دی
+from google.colab import drive 
+drive.mount('/content/drive')
+import string
+
+filematni= open('/content/drive/My Drive/text1.txt',"r",encoding='utf-8-sig').read()
+newtext= filematni.translate(str.maketrans('','',string.punctuation))
+tokens=newtext.split()
+text_rdd= spark.sparkContext.parallelize(tokens)
+counter=text_rdd.map(lambda word:(word,1)).reduceByKey(lambda a,b: a+b).sortBy(lambda x: -x[1]).collect()
+counter
